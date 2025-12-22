@@ -14,7 +14,6 @@ import frc.robot.utils.MiscConstants.SimConstants;
 
 
 
-ElevatorData.length; 
 
 public class ArmSim implements ArmSubsystemIO{
     
@@ -24,6 +23,7 @@ public class ArmSim implements ArmSubsystemIO{
 
     private double inputVolts = 0.0;
     private double previousVelocity = 0.0;
+    private double velocity = 0.0;
 
     public ArmSim() {
         armSim = new SingleJointedArmSim(
@@ -41,9 +41,9 @@ public class ArmSim implements ArmSubsystemIO{
     @Override
 
     public void updateData(ArmData data) {
-        armSim.update(0.02);
-        
-        double velocity = armSim.getVelocityRadPerSec();
+        armSim.update(SimConstants.loopPeriodSec);
+        previousVelocity = velocity;
+        velocity = armSim.getVelocityRadPerSec();
 		data.positionRad = armSim.getAngleRads();
 		data.velocityRadsPerSecond = velocity;
 		data.accelerationRadsPerSecondSquared = ( velocity - previousVelocity ) / SimConstants.loopPeriodSec;
