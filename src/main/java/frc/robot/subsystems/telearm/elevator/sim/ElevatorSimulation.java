@@ -15,6 +15,7 @@ public class ElevatorSimulation implements ElevatorIO{
 
     private double inputVolts = 0.0;
     private double previousVelocity = 0.0;
+    private double velocity = 0.0;
 
     
 
@@ -33,14 +34,8 @@ public class ElevatorSimulation implements ElevatorIO{
     @Override
     public void updateData(ElevatorData data) {
         elevatorSim.update(0.02);
-        double velocity = elevatorSim.getVelocityRadPerSec();
-		data.positionRad = elevatorSim.getAngleRads();
-		data.velocityRadsPerSecond = velocity;
-		data.accelerationRadsPerSecondSquared = ( velocity - previousVelocity ) / SimConstants.loopPeriodSec;
-		data.motorCurrentAmps = elevatorSim.getCurrentDrawAmps();
-		data.motorAppliedVolts = inputVolts;
-		data.motorTempCelcius = 0;
-
+        previousVelocity = velocity;
+        velocity = elevatorSim.getVelocityMetersPerSecond();
         data.positionMeters = elevatorSim.getPositionMeters();
         data.velocityMetersPerSecond = elevatorSim.getVelocityMetersPerSecond();
         data.accelerationMetersPerSecondSquared = (velocity - previousVelocity) / SimConstants.loopPeriodSec;
@@ -50,11 +45,13 @@ public class ElevatorSimulation implements ElevatorIO{
 
     }
 
+    
+
     @Override
 
     public void setVoltage(double volts) {
         inputVolts = MathUtil.clamp(volts, -12, 12);
-        armSim.setInputVoltage(inputVolts);
+        elevatorSim.setInputVoltage(inputVolts);
     }
 
 }

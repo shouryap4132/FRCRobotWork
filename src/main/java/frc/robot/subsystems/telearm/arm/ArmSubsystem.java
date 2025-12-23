@@ -10,8 +10,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.subsystems.telearm.arm.ArmIO.ArmData;
-import frc.robot.subsystems.arm.sim.ArmSim;
+import frc.robot.subsystems.telearm.arm.ArmSubsystemIO.ArmData;
+import frc.robot.subsystems.telearm.arm.sim.ArmSim;
 import edu.wpi.first.units.measure.Angle;
 
 
@@ -37,6 +37,8 @@ public class ArmSubsystem extends SubsystemBase {
   private ArmConstants.ArmStates state = ArmConstants.ArmStates.STOW;
   private ProfiledPIDController profile;
   private ArmFeedforward feedforward;
+
+  public static double angleRad = 0.0;
 
   public ArmSubsystem() {
 
@@ -81,24 +83,29 @@ public class ArmSubsystem extends SubsystemBase {
       state = newState;
   }
 
+  public static void setAngleRad(double angleInRad){
+      angleRad = angleInRad;
+  }
+
   public void stop(){
         armIO.setVoltage(0);
   }
 
-  private void moveToGoal(){
-        profile.setGoal(state.setPointRad);
+  public void moveToGoal(){
+        profile.setGoal(angleRad);
         double pidOutput = profile.calculate(data.positionRad, data.velocityRadsPerSecond);
         double ffOutput = feedforward.calculate(
             profile.getSetpoint().position,
             profile.getSetpoint().velocity);
-        setVoltage(pidOutput + ffOutput);
+        double gravtiyOutput = ArmConstants.kG * Math.cos(data.positionRad);
+        setVoltage(pidOutput + ffOutput + gravityOutput);
   }
 
   @Override
 public void periodic() {
     profile.setPID(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD);
     // profile.setPID(0, 0, 0);
-    armIO.updateData(data);
+    ArmSubsystemIO.updateData(data);
 
     moveToGoal();
 

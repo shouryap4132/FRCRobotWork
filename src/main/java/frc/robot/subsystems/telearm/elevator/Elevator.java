@@ -39,6 +39,8 @@ public class Elevator extends SubsystemBase {
   private ProfiledPIDController profile;
   private ArmFeedforward feedforward;
 
+  public static double heightMeters = 0.0;
+
   public Elevator() {
 
     if (Robot.isSimulation()){
@@ -75,19 +77,23 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setVoltage(double volts){
-    ElevatorIO.setVoltage(volts);
+    elevatorIO.setVoltage(volts);
   }
 
   public void setState(ElevatorConstants.ElevatorStates newState){
       state = newState;
   }
 
+  public static void setHeight(double height){
+    heightMeters = height;
+  }
+
   public void stop(){
-        ElevatorIO.setVoltage(0);
+    elevatorIO.setVoltage(0);
   }
 
   private void moveToGoal(){
-        profile.setGoal(state.heightMeters);
+        profile.setGoal(heightMeters);
         double pidOutput = profile.calculate(data.positionMeters, data.velocityMetersPerSecond);
         double ffOutput = feedforward.calculate(
             profile.getSetpoint().position,
