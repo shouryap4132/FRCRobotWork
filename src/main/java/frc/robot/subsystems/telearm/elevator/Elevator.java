@@ -105,7 +105,7 @@ public class Elevator extends SubsystemBase {
 public void periodic() {
     profile.setPID(ElevatorConstants.ElevatorControl.kP, ElevatorConstants.ElevatorControl.kI, ElevatorConstants.ElevatorControl.kD);
     // profile.setPID(0, 0, 0);
-    ElevatorIO.updateData(data);
+    elevatorIO.updateData(data);
 
     moveToGoal();
 

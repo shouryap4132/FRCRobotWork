@@ -97,7 +97,8 @@ public class ArmSubsystem extends SubsystemBase {
         double ffOutput = feedforward.calculate(
             profile.getSetpoint().position,
             profile.getSetpoint().velocity);
-        double gravtiyOutput = ArmConstants.kG * Math.cos(data.positionRad);
+        double gravityOutput = ArmConstants.simulateGravity ? 
+            ArmConstants.kG * Math.cos(data.positionRad) : 0.0;
         setVoltage(pidOutput + ffOutput + gravityOutput);
   }
 
@@ -105,7 +106,7 @@ public class ArmSubsystem extends SubsystemBase {
 public void periodic() {
     profile.setPID(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD);
     // profile.setPID(0, 0, 0);
-    ArmSubsystemIO.updateData(data);
+    armIO.updateData(data);
 
     moveToGoal();
 
